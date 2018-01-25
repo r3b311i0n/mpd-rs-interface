@@ -1,54 +1,60 @@
-//extern crate libc;
-//
-//use std::ffi::CStr;
-//use std::str;
-//use std::ops::Deref;
-//use libc::c_char;
+extern crate mpd;
 
-//#[link(name = "mpdutils")]
-//extern {
-//    fn get_title() -> *const c_char;
-//    fn goodbye(now_playing: *const c_char);
-//}
-//
-//struct MpdStatus {
-//    now_playing: *const c_char,
-//}
-//
-//impl MpdStatus {
-//    fn new() -> MpdStatus {
-//        MpdStatus { now_playing: unsafe { get_title() } }
-//    }
-//}
-//
-//impl Drop for MpdStatus {
-//    fn drop(&mut self) {
-//        println!("MpdStatus is being killed!");
-//        unsafe {
-//            goodbye(self.now_playing);
-//        }
-//    }
-//}
-//
-//impl Deref for MpdStatus {
-//    type Target = str;
-//
-//    fn deref<'a>(&'a self) -> &'a str {
-//        let c_str = unsafe { CStr::from_ptr(self.now_playing) };
-//        c_str.to_str().unwrap()
-//    }
-//}
+use mpd::Client;
+use std::net::TcpStream;
+use std::env;
+
+
+pub fn play(mut conn: Client) { conn.play().unwrap(); }
+
+pub fn stop(mut conn: Client) { conn.stop().unwrap(); }
 
 fn main() {
-//    let c_buffer: *const c_char = unsafe { get_title() };
-//    let c_string: &CStr = unsafe { CStr::from_ptr(c_buffer) };
-//    let string_slice: &str = c_string.to_str().unwrap();
-//    let song_title: String = string_slice.to_owned();
-//    let mpd_status = MpdStatus::new();
-//    let title_string = str::from_utf8(mpd_status.deref().as_bytes());
-//    let song_title = match title_string {
-//        Ok(v) => v,
-//        Err(_err) => "Err: COULDN'T FORMAT TO UTF-8",
-//    };
-//    println!("{}", song_title);
+    let conn: Client<TcpStream> = Client::connect("127.0.0.1:6600").unwrap();
+
+    parse_cmd_args(conn);
+}
+
+fn parse_cmd_args(conn: Client) {
+    let args: Vec<String> = env::args().collect();
+
+    match args.len() {
+        2 => {
+            let cmd = &args[1];
+            match &cmd[..] {
+                "play" => play(conn),
+                "stop" => stop(conn),
+                "now" => get_current_info(conn, "title"),
+                "album" => get_current_info(conn, "album"),
+                "artist" => get_current_info(conn, "artist"),
+                _ => ()
+            }
+        }
+        _ => { () }
+    }
+}
+
+fn get_current_info(mut conn: Client, tag: &str) {
+    let song = conn.currentsong().unwrap();
+
+    fn no_play() { println!("Nothing is playing!"); }
+
+    match &song {
+        &None => no_play(),
+        &Some(ref s) => match tag {
+            "album" => match &s.tags.get("Album") {
+                &None => println!("Album not found!"),
+                &Some(album) => println!("{}", album),
+            },
+            "artist" => match &s.tags.get("Artist") {
+                &None => println!("Artist not found!"),
+                &Some(artist) => println!("{}", artist),
+            },
+            "title" => match &s.title {
+                &None => no_play(),
+                &Some(ref t) => { println!("{}", t); }
+            },
+            _ => ()
+        }
+    }
 }
