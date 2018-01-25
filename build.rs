@@ -1,4 +1,4 @@
-extern crate gcc;
+//extern crate gcc;
 extern crate bindgen;
 
 use std::env;
@@ -17,8 +17,8 @@ fn main() {
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
 
-    gcc::Build::new()
-        .file("src/mpd_utils.c")
-        .flag("-L -lmpdclient")
-        .compile("libmpdutils.a")
+//    gcc::Build::new()
+//        .file("src/mpd_utils.c")
+//        .flag("-L -lmpdclient")
+//        .compile("libmpdutils.a")
 }
