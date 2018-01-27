@@ -1,5 +1,5 @@
 [package]
-name = "mpd-js"
+name = "mpd-rs-interface"
 version = "0.0.1"
 authors = ["r3b311i0n <nasashinega@gmail.com>"]
 
