@@ -11,6 +11,8 @@ pub fn pause(mut conn: Client) { conn.pause(true).unwrap(); }
 
 pub fn stop(mut conn: Client) { conn.stop().unwrap(); }
 
+pub fn update(mut conn: Client) { conn.rescan().unwrap(); }
+
 fn main() {
     let conn: Client<TcpStream> = Client::connect("127.0.0.1:6600").unwrap();
 
@@ -22,11 +24,12 @@ fn parse_cmd_args(conn: Client) {
 
     match args.len() {
         2 => {
-            let cmd = &args[1];
+            let cmd = &args[1].to_lowercase();
             match &cmd[..] {
                 "play" => play(conn),
                 "pause" => pause(conn),
                 "stop" => stop(conn),
+                "update" => update(conn),
                 "file" => get_current_info(conn, "file"),
                 "stream-name" => get_current_info(conn, "stream-name"),
                 "title" => get_current_info(conn, "title"),
