@@ -32,17 +32,17 @@ fn parse_cmd_args(conn: Client) {
         2 => {
             let cmd = &args[1].to_lowercase();
             match &cmd[..] {
-                "play" => play(conn),
-                "pause" => pause(conn),
+                "play" | "s" => play(conn),
+                "pause" | "p" => pause(conn),
                 "stop" => stop(conn),
-                "next" => next(conn),
-                "prev" => prev(conn),
+                "next" | "ns" => next(conn),
+                "prev" | "ps" => prev(conn),
                 "update" => update(conn),
                 "file" => get_current_info(conn, "file"),
                 "stream-name" => get_current_info(conn, "stream-name"),
-                "title" => get_current_info(conn, "title"),
-                "album" => get_current_info(conn, "album"),
-                "artist" => get_current_info(conn, "artist"),
+                "title" | "ct" => get_current_info(conn, "title"),
+                "album" | "cal" => get_current_info(conn, "album"),
+                "artist" | "cart" => get_current_info(conn, "artist"),
                 "duration" => get_current_info(conn, "duration"),
                 _ => ()
             }
