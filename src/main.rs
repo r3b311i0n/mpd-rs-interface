@@ -9,7 +9,7 @@ use std::env;
 // TODO: Implement JSON serializable for info.
 pub fn play(mut conn: Client) { conn.play().unwrap(); }
 
-pub fn pause(mut conn: Client) { conn.pause(true).unwrap(); }
+pub fn pause(mut conn: Client) { conn.toggle_pause().unwrap(); }
 
 pub fn stop(mut conn: Client) { conn.stop().unwrap(); }
 
