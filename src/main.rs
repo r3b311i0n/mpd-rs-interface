@@ -1,4 +1,6 @@
 extern crate mpd;
+extern crate serde;
+extern crate serde_json;
 
 use mpd::Client;
 use std::net::TcpStream;
@@ -10,6 +12,10 @@ pub fn play(mut conn: Client) { conn.play().unwrap(); }
 pub fn pause(mut conn: Client) { conn.pause(true).unwrap(); }
 
 pub fn stop(mut conn: Client) { conn.stop().unwrap(); }
+
+pub fn next(mut conn: Client) { conn.next().unwrap(); }
+
+pub fn prev(mut conn: Client) { conn.prev().unwrap(); }
 
 pub fn update(mut conn: Client) { conn.rescan().unwrap(); }
 
@@ -29,6 +35,8 @@ fn parse_cmd_args(conn: Client) {
                 "play" => play(conn),
                 "pause" => pause(conn),
                 "stop" => stop(conn),
+                "next" => next(conn),
+                "prev" => prev(conn),
                 "update" => update(conn),
                 "file" => get_current_info(conn, "file"),
                 "stream-name" => get_current_info(conn, "stream-name"),

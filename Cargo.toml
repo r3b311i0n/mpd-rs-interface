@@ -5,3 +5,5 @@ authors = ["r3b311i0n <nasashinega@gmail.com>"]
 
 [dependencies]
 mpd = "*"
+serde = "1.*.*"
+serde_json = "1.*.*"
