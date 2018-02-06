@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
-project(mpd-rs-interface)
+project(mpd_rs_interface)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(mpd-rs-interface
+add_executable(mpd_rs_interface
         src/c/mpd_utils.c src/c/wrapper.h)
 
-target_link_libraries(mpd-rs-interface mpdclient)
+target_link_libraries(mpd_rs_interface mpdclient)

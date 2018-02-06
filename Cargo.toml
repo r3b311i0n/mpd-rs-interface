@@ -1,5 +1,5 @@
 [package]
-name = "mpd-rs-interface"
+name = "mpd_rs_interface"
 version = "0.1.0"
 authors = ["r3b311i0n <nasashinega@gmail.com>"]
 
@@ -7,3 +7,4 @@ authors = ["r3b311i0n <nasashinega@gmail.com>"]
 mpd = "*"
 serde = "1.*.*"
 serde_json = "1.*.*"
+serde_derive = "1.*.*"

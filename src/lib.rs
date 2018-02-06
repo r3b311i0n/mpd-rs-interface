@@ -1,12 +1,22 @@
+#[macro_use]
+extern crate serde_derive;
+
 extern crate mpd;
 extern crate serde;
 extern crate serde_json;
 
 use mpd::Client;
-use std::net::TcpStream;
-use std::env;
 
 // TODO: Implement JSON serializable for info.
+
+#[derive(Serialize, Debug)]
+struct JsonSong {
+    title: String,
+    album: String,
+    artist: String,
+    duration: String,
+}
+
 pub fn play(mut conn: Client) { conn.play().unwrap(); }
 
 pub fn pause(mut conn: Client) { conn.toggle_pause().unwrap(); }
@@ -19,39 +29,7 @@ pub fn prev(mut conn: Client) { conn.prev().unwrap(); }
 
 pub fn update(mut conn: Client) { conn.rescan().unwrap(); }
 
-fn main() {
-    let conn: Client<TcpStream> = Client::connect("127.0.0.1:6600").unwrap();
-
-    parse_cmd_args(conn);
-}
-
-fn parse_cmd_args(conn: Client) {
-    let args: Vec<String> = env::args().collect();
-
-    match args.len() {
-        2 => {
-            let cmd = &args[1].to_lowercase();
-            match &cmd[..] {
-                "play" | "s" => play(conn),
-                "pause" | "p" => pause(conn),
-                "stop" => stop(conn),
-                "next" | "ns" => next(conn),
-                "prev" | "ps" => prev(conn),
-                "update" => update(conn),
-                "file" => get_current_info(conn, "file"),
-                "stream-name" => get_current_info(conn, "stream-name"),
-                "title" | "ct" => get_current_info(conn, "title"),
-                "album" | "cal" => get_current_info(conn, "album"),
-                "artist" | "cart" => get_current_info(conn, "artist"),
-                "duration" => get_current_info(conn, "duration"),
-                _ => ()
-            }
-        }
-        _ => { () }
-    }
-}
-
-fn get_current_info(mut conn: Client, tag: &str) {
+pub fn get_current_info(mut conn: Client, tag: &str) {
     let song = conn.currentsong().unwrap();
 
     fn no_play() { println!("Nothing is playing!"); }
