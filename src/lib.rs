@@ -29,37 +29,37 @@ pub fn prev(mut conn: Client) { conn.prev().unwrap(); }
 
 pub fn update(mut conn: Client) { conn.rescan().unwrap(); }
 
-pub fn get_current_info(mut conn: Client, tag: &str) {
+pub fn get_tag(conn: &mut Client, tag: &str) -> String {
     let song = conn.currentsong().unwrap();
 
-    fn no_play() { println!("Nothing is playing!"); }
+    let no_play = String::from("Nothing is playing!");
 
     match &song {
-        &None => no_play(),
+        &None => return no_play.to_owned(),
         &Some(ref s) => match tag {
-            "file" => println!("{}", &s.file),
+            "file" => return s.file.to_owned(),
             "album" => match &s.tags.get("Album") {
-                &None => println!("Album not found!"),
-                &Some(album) => println!("{}", album),
+                &None => return String::from("Album not found!").to_owned(),
+                &Some(album) => return album.to_owned(),
             },
             "artist" => match &s.tags.get("Artist") {
-                &None => println!("Artist not found!"),
-                &Some(artist) => println!("{}", artist),
+                &None => return String::from("Artist not found!").to_owned(),
+                &Some(artist) => return artist.to_owned(),
             },
             "duration" => match &s.duration {
-                &None => no_play(),
+                &None => return no_play.to_owned(),
                 &Some(ref duration) => {
-                    println!("{minutes}.{seconds}",
-                             minutes = duration.num_minutes(),
-                             seconds = format!("{:02}", (duration.num_seconds() % 60))
-                    );
+                    return format!("{minutes}.{seconds}",
+                                   minutes = duration.num_minutes(),
+                                   seconds = format!("{:02}", (duration.num_seconds() % 60))
+                    ).to_owned();
                 }
             },
             "title" => match &s.title {
-                &None => no_play(),
-                &Some(ref title) => { println!("{}", title); }
+                &None => return no_play.to_owned(),
+                &Some(ref title) => return title.to_owned()
             },
-            _ => ()
+            _ => return String::from("moo!").to_owned()
         }
     }
 }
