@@ -26,7 +26,13 @@ pub fn next(mut conn: Client) { conn.next().unwrap(); }
 
 pub fn prev(mut conn: Client) { conn.prev().unwrap(); }
 
-pub fn update(mut conn: Client) { conn.rescan().unwrap(); }
+pub fn update(mut conn: Client) -> String {
+    let db_scan = conn.rescan();
+    match db_scan {
+        Ok(_) => String::from("Updating Database"),
+        Err(e) => e.to_string()
+    }
+}
 
 pub fn get_song(mut conn: Client) -> String {
     let song = JsonSong {

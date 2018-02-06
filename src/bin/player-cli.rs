@@ -1,4 +1,5 @@
 extern crate mpd_rs_interface;
+
 extern crate mpd;
 
 use mpd::Client;
@@ -33,7 +34,7 @@ fn parse_cmd_args(conn: Client) {
                 "stop" => stop(conn),
                 "next" | "ns" => next(conn),
                 "prev" | "ps" => prev(conn),
-                "update" => update(conn),
+                "update" => update(conn).clear(),
                 "info" | "i" => get_current_info(conn),
 //                "file" => get_current_info(conn, "file"),
 //                "title" | "ct" => get_current_info(conn),
