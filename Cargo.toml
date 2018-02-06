@@ -1,6 +1,6 @@
 [package]
 name = "mpd-rs-interface"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["r3b311i0n <nasashinega@gmail.com>"]
 
 [dependencies]
