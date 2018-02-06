@@ -1,16 +1,15 @@
 #[macro_use]
 extern crate serde_derive;
-
-extern crate mpd;
-extern crate serde;
 extern crate serde_json;
+extern crate serde;
+extern crate mpd;
 
 use mpd::Client;
 
-// TODO: Implement JSON serializable for info.
 
 #[derive(Serialize, Debug)]
 struct JsonSong {
+    file: String,
     title: String,
     album: String,
     artist: String,
@@ -28,6 +27,18 @@ pub fn next(mut conn: Client) { conn.next().unwrap(); }
 pub fn prev(mut conn: Client) { conn.prev().unwrap(); }
 
 pub fn update(mut conn: Client) { conn.rescan().unwrap(); }
+
+pub fn get_song(mut conn: Client) -> String {
+    let song = JsonSong {
+        file: get_tag(&mut conn, "file"),
+        title: get_tag(&mut conn, "title"),
+        album: get_tag(&mut conn, "album"),
+        artist: get_tag(&mut conn, "artist"),
+        duration: get_tag(&mut conn, "duration"),
+    };
+
+    return serde_json::to_string(&song).unwrap();
+}
 
 pub fn get_tag(conn: &mut Client, tag: &str) -> String {
     let song = conn.currentsong().unwrap();
