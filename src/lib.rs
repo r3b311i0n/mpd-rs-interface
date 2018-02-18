@@ -1,11 +1,12 @@
+extern crate mpd;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
 extern crate serde;
-extern crate mpd;
 
 use mpd::Client;
 
+// TODO: Try to use MPD's own db.
 
 #[derive(Serialize, Debug)]
 struct JsonSong {
@@ -15,6 +16,7 @@ struct JsonSong {
     artist: String,
     duration: String,
 }
+
 
 pub fn play(mut conn: Client) { conn.play().unwrap(); }
 

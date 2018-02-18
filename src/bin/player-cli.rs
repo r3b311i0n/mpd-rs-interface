@@ -1,16 +1,53 @@
 extern crate mpd_rs_interface;
 
 extern crate mpd;
+#[macro_use]
+extern crate serde_derive;
+extern crate serde_json;
+extern crate serde;
 
 use mpd::Client;
 use std::net::TcpStream;
 use std::env;
+use std::fs::File;
+use std::io::Write;
 use mpd_rs_interface::{get_tag, next, pause, play, prev, stop, update};
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Conf {
+    mpd_host: String,
+    mpd_port: String,
+}
 
 
 fn main() {
-    let conn: Client<TcpStream> = Client::connect("127.0.0.1:6600").unwrap();
+    let conn: Client<TcpStream> = Client::connect(get_conf()).unwrap();
     parse_cmd_args(conn);
+}
+
+fn get_conf() -> String {
+    let conf_path = "./mpd_rsi.json";
+    let conf_file = File::open(&conf_path);
+    let conf: Conf;
+
+    match conf_file {
+        Ok(json) => conf = serde_json::from_reader(json).unwrap(),
+        Err(_) => conf = || -> Conf {
+            let mut new_file = File::create(&conf_path).unwrap();
+            let new_conf = Conf {
+                mpd_host: "127.0.0.1".to_owned(),
+                mpd_port: "6600".to_owned(),
+            };
+            let conf_json = serde_json::to_string(&new_conf).unwrap();
+
+            println!("Configuration file not found!\nCreating a new one...\n");
+            new_file.write_all(&conf_json.as_bytes()).unwrap();
+
+            return new_conf;
+        }(),
+    }
+
+    return format!("{}:{}", &conf.mpd_host, &conf.mpd_port);
 }
 
 fn get_current_info(mut conn: Client) {
@@ -24,7 +61,7 @@ fn get_current_info(mut conn: Client) {
 
 fn show_help() {
     println!(
-        "\nh ⇾ Show This\n\
+        "h ⇾ Show This\n\
         play | s ⇾ Play\n\
         pause | p ⇾ Pause\n\
         stop ⇾ Stop\n\
@@ -51,11 +88,6 @@ fn parse_cmd_args(conn: Client) {
                 "prev" | "ps" => prev(conn),
                 "update" => update(conn).clear(),
                 "info" | "i" => get_current_info(conn),
-//                "file" => get_current_info(conn, "file"),
-//                "title" | "ct" => get_current_info(conn),
-//                "album" | "cal" => get_current_info(conn, "album"),
-//                "artist" | "cart" => get_current_info(conn, "artist"),
-//                "duration" => get_current_info(conn, "duration"),
                 _ => ()
             }
         }
