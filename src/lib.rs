@@ -6,7 +6,6 @@ extern crate serde;
 
 use mpd::Client;
 
-// TODO: Try to use MPD's own db.
 
 #[derive(Serialize, Debug)]
 struct JsonSong {
@@ -78,7 +77,7 @@ pub fn get_tag(conn: &mut Client, tag: &str) -> String {
                 &None => return no_play.to_owned(),
                 &Some(ref title) => return title.to_owned()
             },
-            _ => return String::from("moo!").to_owned()
+            _ => return String::from("🐄🦄").to_owned()
         }
     }
 }

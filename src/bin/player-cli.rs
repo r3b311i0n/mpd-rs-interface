@@ -1,11 +1,13 @@
 extern crate mpd_rs_interface;
 
+extern crate colored;
 extern crate mpd;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
 extern crate serde;
 
+use colored::*;
 use mpd::Client;
 use std::net::TcpStream;
 use std::env;
@@ -19,6 +21,10 @@ struct Conf {
     mpd_port: String,
 }
 
+
+macro_rules! coloured_print {
+    ($plain_string: ident) => {println!("{}", $plain_string.bright_green().bold())};
+}
 
 fn main() {
     let conn: Client<TcpStream> = Client::connect(get_conf()).unwrap();
@@ -56,7 +62,8 @@ fn get_current_info(mut conn: Client) {
     let artist = get_tag(&mut conn, "artist");
     let duration = get_tag(&mut conn, "duration");
     let file = get_tag(&mut conn, "file");
-    println!("{}\n{}\n{}\n{}\n{}\n", title, album, artist, duration, file);
+    let coloured_string = format!("{}\n{}\n{}\n{}\n{}\n", title, album, artist, duration, file);
+    coloured_print!(coloured_string);
 }
 
 fn show_help() {
