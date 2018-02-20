@@ -13,6 +13,7 @@ use std::net::TcpStream;
 use std::env;
 use std::fs::File;
 use std::io::Write;
+use std::path::Path;
 use mpd_rs_interface::{get_tag, next, pause, play, prev, stop, update};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -32,7 +33,7 @@ fn main() {
 }
 
 fn get_conf() -> String {
-    let conf_path = "./mpd_rsi.json";
+    let conf_path = Path::new("./mpd_rsi.json");
     let conf_file = File::open(&conf_path);
     let conf: Conf;
 
