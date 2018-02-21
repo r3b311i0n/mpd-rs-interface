@@ -16,16 +16,19 @@ use std::io::Write;
 use std::path::Path;
 use mpd_rs_interface::{get_tag, next, pause, play, prev, stop, update};
 
+
 #[derive(Serialize, Deserialize, Debug)]
 struct Conf {
     mpd_host: String,
     mpd_port: String,
+    music_dir: String,
 }
 
 
 macro_rules! coloured_print {
     ($plain_string: ident) => {println!("{}", $plain_string.bright_green().bold())};
 }
+
 
 fn main() {
     let conn: Client<TcpStream> = Client::connect(get_conf()).unwrap();
@@ -44,10 +47,13 @@ fn get_conf() -> String {
             let new_conf = Conf {
                 mpd_host: "127.0.0.1".to_owned(),
                 mpd_port: "6600".to_owned(),
+                music_dir: "".to_owned(),
             };
             let conf_json = serde_json::to_string(&new_conf).unwrap();
 
-            println!("Configuration file not found!\nCreating a new one...\n");
+            println!("Configuration file not found!\nCreating a new one...\n\
+            Please put your music directory as the value of music_dir in mpd_rsi.json!\n");
+
             new_file.write_all(&conf_json.as_bytes()).unwrap();
 
             return new_conf;
