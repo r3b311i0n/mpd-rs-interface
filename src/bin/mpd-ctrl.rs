@@ -6,6 +6,7 @@ extern crate mpd;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate serde;
+extern crate xdg;
 
 use colored::*;
 use mpd::Client;
@@ -13,10 +14,10 @@ use std::net::TcpStream;
 use std::env;
 use std::fs::File;
 use std::io::Write;
-use std::path::Path;
 use mpd_rs_interface::{get_tag, next, pause, play, prev, stop, update};
 
 
+// TODO: Try a timeout.
 #[derive(Serialize, Deserialize, Debug)]
 struct Conf {
     mpd_host: String,
@@ -36,20 +37,25 @@ fn main() {
 }
 
 fn get_conf() -> String {
-    let conf_path = Path::new("./mpd_rsi.json");
-    let conf_file = File::open(&conf_path);
+    let conf_name = "mpd_rsi.json";
+    let xdg_dirs = xdg::BaseDirectories::with_prefix("mpd-ctrl").unwrap();
+    let conf_path = xdg_dirs.find_config_file(&conf_name);
     let conf: Conf;
 
-    match conf_file {
-        Ok(json) => conf = serde_json::from_reader(json).unwrap(),
-        Err(_) => conf = || -> Conf {
-            let mut new_file = File::create(&conf_path).unwrap();
+    match conf_path {
+        Some(conf_file) => conf = || -> Conf {
+            let json = File::open(conf_file).unwrap();
+            return serde_json::from_reader(json).unwrap();
+        }(),
+        None => conf = || -> Conf {
             let new_conf = Conf {
                 mpd_host: "127.0.0.1".to_owned(),
                 mpd_port: "6600".to_owned(),
                 music_dir: "".to_owned(),
             };
             let conf_json = serde_json::to_string(&new_conf).unwrap();
+            let new_conf_path = xdg_dirs.place_config_file(&conf_name).unwrap();
+            let mut new_file = File::create(&new_conf_path).unwrap();
 
             println!("Configuration file not found!\nCreating a new one...\n\
             Please put your music directory as the value of music_dir in mpd_rsi.json!\n");
