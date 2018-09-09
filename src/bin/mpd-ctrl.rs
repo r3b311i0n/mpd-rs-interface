@@ -7,6 +7,7 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate serde;
 extern crate xdg;
+extern crate notify_rust;
 
 use colored::*;
 use mpd::Client;
@@ -15,6 +16,7 @@ use std::env;
 use std::fs::File;
 use std::io::Write;
 use mpd_rs_interface::{get_tag, next, pause, play, prev, stop, update};
+use notify_rust::Notification;
 
 
 // TODO: Try a timeout.
@@ -27,7 +29,7 @@ struct Conf {
 
 
 macro_rules! coloured_print {
-    ($plain_string: ident) => {println!("{}", $plain_string.bright_green().bold())};
+    (&$plain_string: ident) => {println!("{}", $plain_string.bright_green().bold())};
 }
 
 
@@ -75,8 +77,13 @@ fn get_current_info(mut conn: Client) {
     let artist = get_tag(&mut conn, "artist");
     let duration = get_tag(&mut conn, "duration");
     let file = get_tag(&mut conn, "file");
-    let coloured_string = format!("{}\n{}\n{}\n{}\n{}\n", title, album, artist, duration, file);
-    coloured_print!(coloured_string);
+    let coloured_string = format!(
+        "{}\n{}\n{}\n{}\n{}\n",
+        title, album, artist, duration, file
+    );
+    coloured_print!(&coloured_string);
+    show_notification([title, artist].to_vec(),
+                      Some([duration, album].to_vec()));
 }
 
 fn show_help() {
@@ -113,4 +120,18 @@ fn parse_cmd_args(conn: Client) {
         }
         _ => { () }
     }
+}
+
+fn show_notification(title_words: Vec<String>, body_words: Option<Vec<String>>) {
+    let title = title_words.join(" - ");
+    let mut notification = Notification::new();
+    if body_words.is_some() {
+        let body = body_words.unwrap().join("\n");
+        notification.body(&body);
+    }
+    notification
+        .summary(&title)
+        .icon("gnome-music")
+        .appname("mpd-ctrl")
+        .show().unwrap();
 }
